@@ -1,0 +1,34 @@
+version: '2'
+networks:
+  app:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.21.0.0/16
+        gateway: 172.21.0.1
+services:
+  # mysql
+  mysql:
+    build: ./mysql
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    networks:
+      app:
+        ipv4_address: 172.21.1.1
+    ports:
+      - "3306:3306"
+    environment:
+       - MYSQL_ROOT_PASSWORD=root
+  httpd:
+    build: ./httpd
+    volumes:
+      - ./httpd/data:/var/www/html
+    networks:
+      app:
+        ipv4_address: 172.21.2.1
+    ports:
+      - "80:80"
+    links:
+      - "mysql"
+    tty: true
