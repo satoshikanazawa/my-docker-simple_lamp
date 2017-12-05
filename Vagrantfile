@@ -64,22 +64,22 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-get update -y
+    apt-get update -y
     # set locate
-    sudo timedatectl set-timezone Asia/Tokyo
+    timedatectl set-timezone Asia/Tokyo
     # install docker
-    sudo apt-get -y install \
+    apt-get -y install \
       apt-transport-https \
       ca-certificates \
       curl \
       software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository \
       "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) \
       stable"
-    sudo apt-get update -y
-    sudo apt-get -y install docker-ce
+    apt-get update -y
+    apt-get -y install docker-ce
     # install pip
     wget https://bootstrap.pypa.io/get-pip.py
     python3 get-pip.py
@@ -92,8 +92,10 @@ Vagrant.configure("2") do |config|
     # MySQL forword
     iptables -t nat -A PREROUTING -p tcp --dst 192.168.33.100 --dport 3306 -j DNAT --to-destination 172.21.1.1:3306
     # add docker group
-    sudo usermod -aG docker vagrant
-    # edit bash
-    echo 'PS1="[\u@vagrant \W]$ "' >> ~/.bashrc
+    usermod -aG docker vagrant
+  SHELL
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+    # autostart docker-compose
+    docker-compose -f /vagrant/docker-compose/docker-compose.yml up -d
   SHELL
 end
