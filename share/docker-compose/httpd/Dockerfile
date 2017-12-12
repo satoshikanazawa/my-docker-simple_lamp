@@ -33,6 +33,9 @@ RUN mv composer.phar /usr/local/bin/composer
 RUN composer self-update
 RUN composer global require hirak/prestissimo
 
+# edit httpd.conf
+RUN sed -i -e's/^#EnableMMAP \(off\|on\)/EnableMMAP off/' -e's/^#EnableSendfile \(off\|on\)/EnableSendfile off/' /etc/httpd/conf/httpd.conf
+
 # start service
 RUN chkconfig httpd on
 
